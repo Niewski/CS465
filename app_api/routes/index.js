@@ -8,7 +8,10 @@ router
     .get(tripsController.tripsList) // GET Method routes tripsList
     .post(tripsController.tripsAddTrip); // POST Method Add a new trip
 
-// GET Method routes tripsFindByCode - requries parameter
-router.route('/trips/:tripCode').get(tripsController.tripsFindByCode);
+
+router
+    .route('/trips/:tripCode')
+    .get(tripsController.tripsFindByCode) // GET Method routes tripsFindByCode
+    .put(tripsController.tripsUpdateTrip); // PUT Method updates a trip
 
 module.exports = router;
