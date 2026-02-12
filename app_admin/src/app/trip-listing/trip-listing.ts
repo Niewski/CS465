@@ -5,6 +5,8 @@ import { TripCard } from '../trip-card/trip-card';
 import { Trip } from '../models/trip';
 import { TripData } from '../services/trip-data';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-trip-listing',
   imports: [CommonModule, TripCard],
@@ -16,8 +18,14 @@ export class TripListing implements OnInit {
   trips: Trip[] = [];
   message: string = '';
 
-  constructor(private tripData: TripData, private cdr: ChangeDetectorRef) {
+  constructor(private tripData: TripData,
+    private cdr: ChangeDetectorRef,
+    private router: Router) {
     console.log('trip-listing constructor');
+  }
+
+  public addTrip(): void {
+    this.router.navigate(['add-trip']);
   }
 
   private getStuff(): void {

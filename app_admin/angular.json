@@ -19,7 +19,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-               "src/favicon.ico",
+               "public/favicon.ico",
                "src/assets"
             ],
             "styles": [
