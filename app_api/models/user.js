@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     hash: String,
     salt: String
-})
+});
 
 // Method to set the password on this record.
 userSchema.methods.setPassword = function(password){
@@ -35,5 +35,5 @@ userSchema.methods.generateJWT = function() {
     { expiresIn: '1h' }); //Token expires an hour from creation
 };
 
-const User = mongoose.model('users', userSchema)
-module.exports = User
+const User = mongoose.model('users', userSchema);
+module.exports = User;
