@@ -7,11 +7,11 @@ const authController = require('../controllers/authentication');
 router
     .route('/register')
     .post(authController.register); // POST Method routes register
-/*
+
 router
     .route('/login')
     .post(authController.login); // POST Method routes login
-*/
+
 // Define the route for /trips with GET and POST methods
 router
     .route('/trips')
