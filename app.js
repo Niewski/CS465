@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 // Wire in our authentication module
 var passport = require('passport');
+var jwt = require('jsonwebtoken');
 require('./app_api/config/passport');
 
 var indexRouter = require('./app_server/routes/index');
@@ -41,6 +42,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
+
+// Decode JWT cookie for Handlebars templates
+app.use((req, res, next) => {
+  const token = req.cookies && req.cookies['travlr-token'];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      res.locals.user = {
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role
+      };
+    } catch (err) {
+      res.locals.user = null;
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
 
 // Enable CORS
 app.use('/api', (req, res, next) => {
