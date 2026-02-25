@@ -28,6 +28,11 @@ app.set('views', path.join(__dirname, 'app_server', 'views'));
 // register handlebars partials
 handlebars.registerPartials(__dirname + '/app_server/views/partials');
 
+// Register Handlebars helpers
+handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));

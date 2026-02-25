@@ -15,17 +15,47 @@
 					<div>
 						<div class="body">
 							<h1>Travel</h1>
+							<div class="mb-3">
+								<ul class="nav nav-pills">
+									<li class="nav-item"><a class="nav-link {{#ifEquals selectedCategory ""}}active{{/ifEquals}}" href="/travel">All</a></li>
+									<li class="nav-item"><a class="nav-link {{#ifEquals selectedCategory "Beaches"}}active{{/ifEquals}}" href="/travel?category=Beaches">Beaches</a></li>
+									<li class="nav-item"><a class="nav-link {{#ifEquals selectedCategory "Cruises"}}active{{/ifEquals}}" href="/travel?category=Cruises">Cruises</a></li>
+									<li class="nav-item"><a class="nav-link {{#ifEquals selectedCategory "Mountains"}}active{{/ifEquals}}" href="/travel?category=Mountains">Mountains</a></li>
+								</ul>
+								<script>
+								// Client-side search filter for travel listing
+								document.addEventListener('DOMContentLoaded', function(){
+								  const input = document.getElementById('searchInput');
+								  if (!input) return;
+								  input.addEventListener('input', function(e){
+								    const q = e.target.value.trim().toLowerCase();
+								    const items = document.querySelectorAll('.trip-item');
+								    items.forEach(function(it){
+								      const name = (it.querySelector('.trip-name')?.innerText || '').toLowerCase();
+								      const resort = (it.querySelector('.trip-resort')?.innerText || '').toLowerCase();
+								      const show = q === '' || name.indexOf(q) !== -1 || resort.indexOf(q) !== -1;
+								      it.style.display = show ? '' : 'none';
+								    });
+								  });
+								});
+								</script>
+									<div class="mt-2">
+										<input id="searchInput" class="form-control" placeholder="Search trips by name or resort...">
+									</div>
+
+							</div>
 							<ul id="sites">
 								{{#each trips}}
-								
-								<li>
+								<li class="trip-item">
 									<a href="/api/trips/{{this.code}}"><img src="{{this.image}}" alt="Img"></a>
-									<h2><a href="/travel">{{this.name}}</a></h2>
+									<h2 class="trip-name"><a href="/travel">{{this.name}}</a></h2>
+									<p class="trip-resort">
+										{{this.resort}}
+									</p>
 									<p>
 										{{{this.description}}}
 									</p>
 								</li>
-								
 								{{/each}}
 							</ul>
 						</div>
