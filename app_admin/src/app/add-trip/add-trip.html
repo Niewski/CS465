@@ -115,6 +115,23 @@
             }
         }
         </div>
+        <div class="form-group">
+        <label>Category:</label>
+        <select formControlName="category" class="form-control"
+        [ngClass]="{ 'is-invalid': submitted && f['category'].errors }">
+            <option value="" disabled>Select a category</option>
+            <option value="Beaches">Beaches</option>
+            <option value="Cruises">Cruises</option>
+            <option value="Mountains">Mountains</option>
+        </select>
+        @if (submitted && f['category'].errors) {
+            @if (f['category'].errors?.['required']) {
+            <div>
+                Category is required
+            </div>
+            }
+        }
+        </div>
         <button type="submit" class="btn btn-info">Save</button>
     </form>
     }
