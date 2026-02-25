@@ -8,4 +8,6 @@ export interface Trip {
     perPerson: string;
     image: string;
     description: string;
+    category: 'Beaches' | 'Cruises' | 'Mountains';
+    deletedAt: Date | null;
 }

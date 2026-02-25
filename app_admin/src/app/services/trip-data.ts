@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthResponse } from '../models/auth-response';
@@ -17,8 +17,26 @@ export class TripData {
   baseUrl = 'http://localhost:3000/api';
   url = 'http://localhost:3000/api/trips';
 
-  getTrips(): Observable<Trip[]> {
-    return this.http.get<Trip[]>(this.url);
+  getTrips(options?: { category?: string; search?: string; includeDeleted?: boolean }): Observable<Trip[]> {
+    let params = new HttpParams();
+    if (options?.category) {
+      params = params.set('category', options.category);
+    }
+    if (options?.search) {
+      params = params.set('search', options.search);
+    }
+    if (options?.includeDeleted) {
+      params = params.set('includeDeleted', 'true');
+    }
+    return this.http.get<Trip[]>(this.url, { params });
+  }
+
+  deleteTrip(tripCode: string): Observable<any> {
+    return this.http.delete(`${this.url}/${tripCode}`);
+  }
+
+  restoreTrip(tripCode: string): Observable<any> {
+    return this.http.patch(`${this.url}/${tripCode}/restore`, {});
   }
 
   addTrip(formData: Trip): Observable<Trip> {
