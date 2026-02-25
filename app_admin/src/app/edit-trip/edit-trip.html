@@ -115,7 +115,27 @@
             }
         }
         </div>
-        <button type="submit" class="btn btn-info">Save</button>
+        <div class="form-group">
+        <label>Category:</label>
+        <select formControlName="category" class="form-control"
+        [ngClass]="{ 'is-invalid': submitted && f['category'].errors }">
+            <option value="" disabled>Select a category</option>
+            <option value="Beaches">Beaches</option>
+            <option value="Cruises">Cruises</option>
+            <option value="Mountains">Mountains</option>
+        </select>
+        @if (submitted && f['category'].errors) {
+            @if (f['category'].errors?.['required']) {
+            <div>
+                Category is required
+            </div>
+            }
+        }
+        </div>
+        <div class="d-flex gap-2 mt-2">
+            <button type="submit" class="btn btn-info">Save</button>
+            <button type="button" class="btn btn-danger" (click)="onDelete()">Delete</button>
+        </div>
     </form>
     }
 </div>

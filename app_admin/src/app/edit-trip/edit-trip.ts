@@ -45,7 +45,8 @@ export class EditTrip implements OnInit {
       resort: ['', Validators.required],
       perPerson: ['', Validators.required],
       image: ['', Validators.required],
-      description: ['', Validators.required]
+      description: ['', Validators.required],
+      category: ['', Validators.required]
     })
 
     this.tripDataService.getTrip(tripCode)
@@ -90,6 +91,21 @@ export class EditTrip implements OnInit {
           console.log('Error: ' + error);
         }
       })
+    }
+  }
+
+  public onDelete(): void {
+    if (this.trip && confirm('Are you sure you want to delete this trip?')) {
+      this.tripDataService.deleteTrip(this.trip.code)
+      .subscribe({
+        next: (value: any) => {
+          console.log('Deleted', value);
+          this.router.navigate(['']);
+        },
+        error: (error: any) => {
+          console.log('Error: ' + error);
+        }
+      });
     }
   }
 
