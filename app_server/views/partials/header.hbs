@@ -4,27 +4,24 @@
     </div>
     <div id="navigation">
         <ul>
-            <li>
-                <a href="index.html">Home</a>
-            </li>
-            <li class="selected">
-                <a href="/travel">Travel</a>
-            </li>
-            <li>
-                <a href="rooms.html">Rooms</a>
-            </li>
-            <li>
-                <a href="meals.html">Meals</a>
-            </li>
-            <li>
-                <a href="news.html">News</a>
-            </li>
-            <li>
-                <a href="about.html">About</a>
-            </li>
-            <li>
-                <a href="contact.html">Contact</a>
-            </li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="/travel">Travel</a></li>
+            <li><a href="news.html">News</a></li>
+            {{#if user}}
+            <li><a href="/reservations">Reservations</a></li>
+            {{/if}}
+            {{#if user}}
+            {{#ifEquals user.role "admin"}}
+            <li><a href="http://localhost:4200">Admin</a></li>
+            {{/ifEquals}}
+            {{/if}}
+            <li><a href="/checkout">Checkout</a></li>
+            {{#unless user}}
+            <li><a href="http://localhost:4200/login">Login</a></li>
+            {{/unless}}
+            {{#if user}}
+            <li><a href="/logout">Logout</a></li>
+            {{/if}}
         </ul>
     </div>
 </div>
