@@ -11,9 +11,14 @@
         </p>
         <p class="card-text" [innerHTML]="trip.description">
         </p>
-        @if(isLoggedIn()) {
+        @if(isAdmin()) {
             <div>
-                <button class="btn btn-info" (click)="editTrip(trip)">Edit Trip</button>
+                @if(!trip.deletedAt) {
+                    <button class="btn btn-info" (click)="editTrip(trip)">Edit Trip</button>
+                }
+                @if(trip.deletedAt) {
+                    <button class="btn btn-success" (click)="onRestore()">Restore</button>
+                }
             </div>
         }
     </div>

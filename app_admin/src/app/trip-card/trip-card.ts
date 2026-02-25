@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Trip } from '../models/trip';
 import { Authentication } from '../services/authentication';
+import { TripData } from '../services/trip-data';
 
 @Component({
   selector: 'app-trip-card',
@@ -14,7 +15,8 @@ export class TripCard implements OnInit {
   @Input('trip') trip: any;
 
   constructor(private router: Router,
-    private authenticationService: Authentication) { }
+    private authenticationService: Authentication,
+    private tripDataService: TripData) { }
 
   ngOnInit(): void {
   }
@@ -25,7 +27,26 @@ export class TripCard implements OnInit {
     this.router.navigate(['/edit-trip']);
   }
 
-  public isLoggedIn(): boolean {
-    return this.authenticationService.isLoggedIn();
+  public isAdmin(): boolean {
+    const token = this.authenticationService.getToken();
+    if (!token) { return false; }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role && payload.role === 'admin';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  public onRestore() {
+    if (!this.trip || !this.trip.code) { return; }
+    this.tripDataService.restoreTrip(this.trip.code).subscribe({
+      next: () => {
+        this.trip.deletedAt = null;
+      },
+      error: (err) => {
+        console.error('Restore failed', err);
+      }
+    });
   }
 }
