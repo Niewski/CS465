@@ -21,6 +21,12 @@ const register = async (req, res) => {
         return res.status(400).json(err);
     }
     const token = user.generateJWT();
+    res.cookie('travlr-token', token, {
+        httpOnly: false,
+        maxAge: 3600000,
+        sameSite: 'Lax',
+        path: '/'
+    });
     return res.status(200).json(token);
 }
 
@@ -43,14 +49,15 @@ const login = (req, res) => {
         if (user) { 
             // Auth succeeded - generate JWT and return to caller
             const token = user.generateJWT();
-            res
-            .status(200)
-            .json({token});
-        } else { 
-            // Auth failed return error
-            res
-            .status(401)
-            .json(info);
+            res.cookie('travlr-token', token, {
+                httpOnly: false,
+                maxAge: 3600000,
+                sameSite: 'Lax',
+                path: '/'
+            });
+            res.status(200).json({token});
+        } else {
+            res.status(401).json(info);
         }
     })(req, res);
 };
