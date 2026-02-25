@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Trip } from '../models/trip';
 import { Authentication } from '../services/authentication';
@@ -16,7 +17,8 @@ export class TripCard implements OnInit {
 
   constructor(private router: Router,
     private authenticationService: Authentication,
-    private tripDataService: TripData) { }
+    private tripDataService: TripData,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
   }
@@ -43,6 +45,7 @@ export class TripCard implements OnInit {
     this.tripDataService.restoreTrip(this.trip.code).subscribe({
       next: () => {
         this.trip.deletedAt = null;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Restore failed', err);
