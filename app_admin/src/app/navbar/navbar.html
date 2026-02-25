@@ -13,7 +13,10 @@
     </div>
     <div class="navbar-end ">
         @if(!isLoggedIn()) {
-            <a class="nav-item" routerLink="login">
+            <a class="nav-item" routerLink="/signup">
+                <span class="has-icon-left">Sign Up</span>
+            </a>
+            <a class="nav-item" routerLink="/login">
                 <span class="has-icon-left">Log In</span>
             </a>
         }
