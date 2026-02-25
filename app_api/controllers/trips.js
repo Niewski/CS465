@@ -3,91 +3,159 @@ const Trip = require('../models/travlr');
 const Model = mongoose.model('trips');
 
 // GET: /trips - list all the trips
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
+// Supports query params: ?category=Beaches&search=reef&includeDeleted=true
 const tripsList = async (req, res) => {
-    const q = await Model.find().exec();
+    try {
+        const filter = {};
 
-    if (!q || q.length === 0) {
-        return res.status(404).json(err);
-    } else {
-        return res.status(200).json(q);
+        // By default, hide soft-deleted trips
+        if (req.query.includeDeleted !== 'true') {
+            filter.deletedAt = null;
+        }
+
+        // Filter by category if provided
+        if (req.query.category) {
+            filter.category = req.query.category;
+        }
+
+        // Search by name or resort if provided
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i');
+            filter.$or = [
+                { name: searchRegex },
+                { resort: searchRegex }
+            ];
+        }
+
+        const q = await Model.find(filter).exec();
+
+        if (!q || q.length === 0) {
+            return res.status(404).json({ message: 'No trips found' });
+        } else {
+            return res.status(200).json(q);
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
     }
 };
 
 // GET: /trips/:tripCode - lists a single trip
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
 const tripsFindByCode = async (req, res) => {
-    const q = await Model.findOne({ 'code': req.params.tripCode }).exec();
+    try {
+        const q = await Model.findOne({ 'code': req.params.tripCode }).exec();
 
-    if (!q) {
-        return res.status(404).json(err);
-    } else {
-        return res.status(200).json(q);
+        if (!q) {
+            return res.status(404).json({ message: 'Trip not found' });
+        } else {
+            return res.status(200).json(q);
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
     }
 };
 
-// Post: /trips - adds a new trip to the database
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
+// POST: /trips - adds a new trip to the database
 const tripsAddTrip = async (req, res) => {
-    const newTrip = new Trip({
-        code: req.body.code,
-        name: req.body.name,
-        length: req.body.length,
-        start: req.body.start,
-        resort: req.body.resort,
-        perPerson: req.body.perPerson,
-        image: req.body.image,
-        description: req.body.description
-    });
+    try {
+        const newTrip = new Trip({
+            code: req.body.code,
+            name: req.body.name,
+            length: req.body.length,
+            start: req.body.start,
+            resort: req.body.resort,
+            perPerson: req.body.perPerson,
+            image: req.body.image,
+            description: req.body.description,
+            category: req.body.category
+        });
 
-    const q = await newTrip.save().catch((err) => {
-        return res.status(400).json(err);
-    });
-
-    return res.status(201).json(q);
-};
-
-// PUT: /trips/:tripCode - Adds a new Trip
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
-const tripsUpdateTrip = async(req, res) => {
-    // Uncomment for debugging
-    console.log(req.params);
-    console.log(req.body);
-    const q = await Model
-        .findOneAndUpdate(
-            { 'code' : req.params.tripCode },
-            {
-                code: req.body.code,
-                name: req.body.name,
-                length: req.body.length,
-                start: req.body.start,
-                resort: req.body.resort,
-                perPerson: req.body.perPerson,
-                image: req.body.image,
-                description: req.body.description
-            }
-        )
-        .exec();
-
-    if(!q) { // Database returned no data
-        return res
-        .status(400)
-        .json(err);
-    } else { // Return resulting updated trip
-        return res
-        .status(201)
-        .json(q);
+        const q = await newTrip.save();
+        return res.status(201).json(q);
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
     }
 };
 
+// PUT: /trips/:tripCode - Updates an existing Trip
+const tripsUpdateTrip = async (req, res) => {
+    try {
+        console.log(req.params);
+        console.log(req.body);
+        const q = await Model
+            .findOneAndUpdate(
+                { 'code': req.params.tripCode },
+                {
+                    code: req.body.code,
+                    name: req.body.name,
+                    length: req.body.length,
+                    start: req.body.start,
+                    resort: req.body.resort,
+                    perPerson: req.body.perPerson,
+                    image: req.body.image,
+                    description: req.body.description,
+                    category: req.body.category
+                },
+                { new: true }
+            )
+            .exec();
+
+        if (!q) {
+            return res.status(400).json({ message: 'Trip not found' });
+        } else {
+            return res.status(201).json(q);
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+// DELETE: /trips/:tripCode - Soft delete (sets deletedAt timestamp)
+const tripsDeleteTrip = async (req, res) => {
+    try {
+        const q = await Model
+            .findOneAndUpdate(
+                { 'code': req.params.tripCode },
+                { deletedAt: new Date() },
+                { new: true }
+            )
+            .exec();
+
+        if (!q) {
+            return res.status(404).json({ message: 'Trip not found' });
+        } else {
+            return res.status(200).json({ message: 'Trip deleted', trip: q });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+// PATCH: /trips/:tripCode/restore - Restore a soft-deleted trip
+const tripsRestoreTrip = async (req, res) => {
+    try {
+        const q = await Model
+            .findOneAndUpdate(
+                { 'code': req.params.tripCode },
+                { deletedAt: null },
+                { new: true }
+            )
+            .exec();
+
+        if (!q) {
+            return res.status(404).json({ message: 'Trip not found' });
+        } else {
+            return res.status(200).json({ message: 'Trip restored', trip: q });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+};
 
 module.exports = {
     tripsList,
     tripsFindByCode,
     tripsAddTrip,
-    tripsUpdateTrip
+    tripsUpdateTrip,
+    tripsDeleteTrip,
+    tripsRestoreTrip
 };
