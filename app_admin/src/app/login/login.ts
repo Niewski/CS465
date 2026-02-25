@@ -53,14 +53,22 @@ export class Login {
       this.credentials.password);
     if(this.authenticationService.isLoggedIn())
     {
-      // console.log('Router::Direct');
-      this.router.navigate(['']);
+      const user = this.authenticationService.getCurrentUser();
+      if(user.role && user.role !== 'admin') {
+        window.location.href = 'http://localhost:3000';
+      } else {
+        this.router.navigate(['']);
+      }
     } else {
       var timer = setTimeout(() => {
       if(this.authenticationService.isLoggedIn())
       {
-        // console.log('Router::Pause');
-        this.router.navigate(['']);
+        const user = this.authenticationService.getCurrentUser();
+        if(user.role && user.role !== 'admin') {
+          window.location.href = 'http://localhost:3000';
+        } else {
+          this.router.navigate(['']);
+        }
       }},3000);
     }
   }

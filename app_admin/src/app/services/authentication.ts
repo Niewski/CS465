@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthResponse } from '../models/auth-response';
 import { User } from '../models/user';
 import { TripData } from '../services/trip-data';
@@ -12,7 +13,8 @@ export class Authentication {
   // Setup our storage and service access
   constructor(
   @Inject(BROWSER_STORAGE) private storage: Storage,
-    private tripDataService: TripData
+    private tripDataService: TripData,
+    private router: Router
     ) { }
 
   // Variable to handle Authentication Responses
@@ -41,8 +43,17 @@ export class Authentication {
   }
 
   // Logout of our application and remove the JWT from Storage
+  // Also clear the server-side cookie by calling the Express logout endpoint
   public logout(): void {
     this.storage.removeItem('travlr-token');
+    // Clear the travlr-token cookie via the Express logout route
+    fetch('http://localhost:3000/logout', { credentials: 'include' }).catch(() => {});
+    // Redirect to the login page after logout
+    try {
+      this.router.navigate(['/login']);
+    } catch {
+      // ignore navigation errors
+    }
   }
 
   // Boolean to determine if we are logged in and the token is
@@ -64,8 +75,11 @@ export class Authentication {
   // isLoggedIn.
   public getCurrentUser(): User {
     const token: string = this.getToken();
-    const { email, name } = JSON.parse(atob(token.split('.')[1]));
-    return { email, name } as User;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const email = payload.email;
+    const name = payload.name;
+    const role = payload.role || '';
+    return { email, name, role } as User;
   }
 
   // Login method that leverages the login method in tripDataService
