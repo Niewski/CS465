@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from "@angular/forms";
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { User } from '../models/user';
 import { Authentication } from '../services/authentication';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './signup.html',
   styleUrl: './signup.css',
 })
@@ -58,7 +58,12 @@ export class Signup {
     // Wait briefly for the async registration to complete, then redirect
     var timer = setTimeout(() => {
       if (this.authenticationService.isLoggedIn()) {
-        this.router.navigate(['']);
+        const user = this.authenticationService.getCurrentUser();
+        if (user.role && user.role !== 'admin') {
+          window.location.href = 'http://localhost:3000';
+        } else {
+          this.router.navigate(['']);
+        }
       } else {
         this.formError = 'Registration failed. The email may already be in use.';
       }
