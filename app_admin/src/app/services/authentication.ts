@@ -61,10 +61,16 @@ export class Authentication {
   // reauthenticate if the token has expired
   public isLoggedIn(): boolean {
     const token: string = this.getToken();
-    
+
     if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp > (Date.now() / 1000);
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp > (Date.now() / 1000);
+      } catch {
+        // Token is corrupt — remove it and treat as logged out
+        this.storage.removeItem('travlr-token');
+        return false;
+      }
     }
 
     return false;

@@ -27,7 +27,7 @@ const register = async (req, res) => {
         sameSite: 'Lax',
         path: '/'
     });
-    return res.status(200).json(token);
+    return res.status(200).json({ token });
 }
 
 const login = (req, res) => {
@@ -55,7 +55,7 @@ const login = (req, res) => {
                 sameSite: 'Lax',
                 path: '/'
             });
-            res.status(200).json({token});
+            res.status(200).json({ token });
         } else {
             res.status(401).json(info);
         }
