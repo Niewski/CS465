@@ -40,27 +40,50 @@ export class EditTrip implements OnInit {
       _id: [],
       code: [tripCode, Validators.required],
       name: ['', Validators.required],
-      length: ['', Validators.required],
+      nights: [1, [Validators.required, Validators.min(0)]],
+      days: [2, [Validators.required, Validators.min(0)]],
       start: ['', Validators.required],
       resort: ['', Validators.required],
       perPerson: ['', Validators.required],
       image: ['', Validators.required],
       description: ['', Validators.required],
       category: ['', Validators.required]
-    })
+    });
+
+    // Auto-update days when nights changes
+    this.editForm.get('nights')!.valueChanges.subscribe((nightsValue: number) => {
+      this.editForm.get('days')!.setValue(nightsValue + 1, { emitEvent: false });
+    });
 
     this.tripDataService.getTrip(tripCode)
     .subscribe({
       next: (value: any) => {
         this.trip = value;
         // Format the date for the form
-        const patch = {
-          ...value,
-          start: value?.start ? new Date(value.start).toISOString().slice(0, 10) : ''
-        };
-        
+        const startFormatted = value?.start ? new Date(value.start).toISOString().slice(0, 10) : '';
+
+        // Parse the length string into nights and days
+        let nights = 1;
+        let days = 2;
+        if (value?.length) {
+          const match = value.length.match(/(\d+)\s*nights?\s*\/\s*(\d+)\s*days?/i);
+          if (match) {
+            nights = parseInt(match[1], 10);
+            days = parseInt(match[2], 10);
+          }
+        }
+
         // Populate our record into the form
-        this.editForm.patchValue(patch);
+        const { length, ...rest } = value;
+        const patch = {
+          ...rest,
+          start: startFormatted,
+          nights,
+          days
+        };
+
+        this.editForm.patchValue(patch, { emitEvent: false });
+
         if(!value)
         {
           this.message = 'No Trip Retrieved!';
@@ -76,12 +99,29 @@ export class EditTrip implements OnInit {
     })
   }
   
+  increment(field: 'nights' | 'days'): void {
+    const control = this.editForm.get(field)!;
+    control.setValue(control.value + 1);
+  }
+
+  decrement(field: 'nights' | 'days'): void {
+    const control = this.editForm.get(field)!;
+    if (control.value > 0) {
+      control.setValue(control.value - 1);
+    }
+  }
+
   public onSubmit()
   {
     this.submitted = true;
     if(this.editForm.valid)
     {
-      this.tripDataService.updateTrip(this.editForm.value)
+      const formValue = this.editForm.value;
+      const length = `${formValue.nights} nights / ${formValue.days} days`;
+      const { nights, days, ...rest } = formValue;
+      const tripData = { ...rest, length };
+
+      this.tripDataService.updateTrip(tripData)
       .subscribe({
         next: (value: any) => {
           console.log(value);
