@@ -4,6 +4,7 @@ const ctrlMain = require('../controllers/main');
 
 router.get('/', ctrlMain.index);
 router.get('/reservations', ctrlMain.reservations);
+router.get('/news', ctrlMain.news);
 router.get('/checkout', ctrlMain.checkout);
 router.get('/logout', ctrlMain.logout);
 

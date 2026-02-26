@@ -9,6 +9,10 @@ const reservations = (req, res) => {
   res.render('reservations', { title: 'Reservations - Travlr Getaways' });
 }
 
+const news = (req, res) => {
+  res.render('news', { title: 'News - Travlr Getaways' });
+}
+
 const checkout = (req, res) => {
   res.render('checkout', { title: 'Checkout - Travlr Getaways' });
 }
@@ -18,4 +22,4 @@ const logout = (req, res) => {
   res.redirect('/');
 }
 
-module.exports = { index, reservations, checkout, logout };
+module.exports = { index, reservations, news, checkout, logout };
