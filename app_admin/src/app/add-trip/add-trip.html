@@ -32,18 +32,31 @@
         }
         </div>
         <div class="form-group">
-        <label>Length:</label>
-        <input type="text" formControlName="length"
-        placeholder="Name" class="form-control"
-        [ngClass]="{ 'is-invalid': submitted && f['length'].errors
-        }">
-        @if (submitted && f['length'].errors) {
-            @if (f['length'].errors?.['required']) {
-            <div>
-                Length is required
+            <label>Length:</label>
+            <div class="counter-row">
+                <div class="counter-group">
+                    <span class="counter-label">Nights</span>
+                    <div class="counter-controls">
+                        <button type="button" class="btn btn-outline-secondary btn-counter" (click)="decrement('nights')">−</button>
+                        <input type="number" formControlName="nights" class="form-control counter-input" readonly>
+                        <button type="button" class="btn btn-outline-secondary btn-counter" (click)="increment('nights')">+</button>
+                    </div>
+                    @if (submitted && f['nights'].errors) {
+                        <div class="text-danger">Nights is required</div>
+                    }
+                </div>
+                <div class="counter-group">
+                    <span class="counter-label">Days</span>
+                    <div class="counter-controls">
+                        <button type="button" class="btn btn-outline-secondary btn-counter" (click)="decrement('days')">−</button>
+                        <input type="number" formControlName="days" class="form-control counter-input" readonly>
+                        <button type="button" class="btn btn-outline-secondary btn-counter" (click)="increment('days')">+</button>
+                    </div>
+                    @if (submitted && f['days'].errors) {
+                        <div class="text-danger">Days is required</div>
+                    }
+                </div>
             </div>
-            }
-        }
         </div>
         <div class="form-group">
         <label>Start:</label>
